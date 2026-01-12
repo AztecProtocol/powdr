@@ -2,6 +2,7 @@
 
 mod call_graph;
 mod condenser;
+mod isolated_column_checker;
 pub mod evaluator;
 pub mod expression_processor;
 mod pil_analyzer;
@@ -24,6 +25,7 @@ use powdr_ast::{
 };
 
 pub use pil_analyzer::{analyze_ast, analyze_file, analyze_string};
+pub use isolated_column_checker::{isolated_committed_columns, IsolatedCommittedColumn};
 
 pub trait AnalysisDriver: Clone + Copy {
     /// Turns a declaration into an absolute name.

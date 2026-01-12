@@ -21,7 +21,7 @@ use powdr_ast::analyzed::{
 use powdr_parser::parse_type;
 
 use crate::type_inference::{infer_types, ExpectedType};
-use crate::{side_effect_checker, AnalysisDriver};
+use crate::{AnalysisDriver, isolated_committed_columns, side_effect_checker};
 
 use crate::statement_processor::{Counters, PILItem, StatementProcessor};
 use crate::{condenser, evaluator, expression_processor::ExpressionProcessor};
@@ -49,7 +49,17 @@ fn analyze<T: FieldElement>(files: Vec<PILFile>) -> Analyzed<T> {
     analyzer.process(files);
     analyzer.side_effect_check();
     analyzer.type_check();
-    analyzer.condense()
+    let analyzed = analyzer.condense();
+    let isolated = isolated_committed_columns(&analyzed);
+    if !isolated.is_empty() {
+        eprintln!("Isolated committed columns detected (declared but never referenced by any constraint/lookup/permutation/public declaration):\n");
+        for d in isolated {
+            let file = d.source.file_name.as_ref().unwrap();
+            eprintln!("- {} ({}): {} .. {}", d.name, file, d.source.start, d.source.end);
+        }
+        panic!("Isolated committed columns detected");
+    }
+    analyzed
 }
 
 #[derive(Default)]
