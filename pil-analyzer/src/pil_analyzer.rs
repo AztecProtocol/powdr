@@ -20,7 +20,7 @@ use powdr_ast::analyzed::{
     type_from_definition, Analyzed, Expression, FunctionValueDefinition, Identity, IdentityKind,
     PolynomialType, PublicDeclaration, StatementIdentifier, Symbol, SymbolKind,
 };
-use powdr_parser::{parse_type};
+use powdr_parser::parse_type;
 
 use crate::type_inference::{infer_types, ExpectedType};
 use crate::{AnalysisDriver, check_no_dead_committed_columns, side_effect_checker};
