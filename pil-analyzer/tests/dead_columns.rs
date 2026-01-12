@@ -13,12 +13,8 @@ fn dead_committed_columns_basic() {
     let analyzed = analyze_string::<GoldilocksField>(input);
     let dead = dead_committed_columns(&analyzed);
 
-    assert!(!dead.is_empty(), "expected no dead columns, got: {dead:?}");
-    assert!(dead.iter().any(|d| d.name == "N.b"), "expected N.b to be dead, got: {dead:?}");
-    assert!(
-        !dead.iter().any(|d| d.name == "N.a"),
-        "expected N.a to be used, got: {dead:?}"
-    );
+    assert!(dead.len() == 1, "expected 1 dead column, got: {dead:?}");
+    assert!(dead[0].name == "N.b", "expected N.b to be dead, got: {dead:?}");
 }
 
 
@@ -30,8 +26,21 @@ fn dead_commited_test_1() {
     let analyzed = analyze_string::<GoldilocksField>(input);
     let dead = dead_committed_columns(&analyzed);
 
-    assert!(!dead.is_empty(), "expected dead columns, got: {dead:?}");
-    assert!(dead.iter().any(|d| d.name == "secret_value"), "expected secret_value to be dead, got: {dead:?}");
+    assert!(dead.len() == 1, "expected 1 dead column, got: {dead:?}");
+    assert!(dead[0].name == "secret_value", "expected secret_value to be dead, got: {dead:?}");
+}
+
+#[test]
+fn dead_commited_test_2() {
+    let input = r#"
+        pol commit secret_value;
+        pol commit other_value;
+    "#;
+    let analyzed = analyze_string::<GoldilocksField>(input);
+    let dead = dead_committed_columns(&analyzed);
+    assert!(dead.len() == 2, "expected 1 dead column, got: {dead:?}");
+    assert!(dead[0].name == "secret_value", "expected secret_value to be dead, got: {dead:?}");
+    assert!(dead[1].name == "other_value", "expected other_value to be dead, got: {dead:?}");
 }
 
 #[test]
@@ -46,7 +55,7 @@ fn used_in_itermidiate_then_constrained() {
     let analyzed = analyze_string::<GoldilocksField>(input);
     let dead = dead_committed_columns(&analyzed);
 
-    assert!(dead.is_empty(), "expected no dead columns, got: {dead:?}");
+    assert!(dead.len() == 0, "expected no dead columns, got: {dead:?}");
 }
 
 #[test]
@@ -58,8 +67,8 @@ fn used_in_intermediate_then_not_constrained() {
     let analyzed = analyze_string::<GoldilocksField>(input);
     let dead = dead_committed_columns(&analyzed);
 
-    assert!(!dead.is_empty(), "expected dead columns, got: {dead:?}");
-    assert!(dead.iter().any(|d| d.name == "raw_value"), "expected raw_value to be dead, got: {dead:?}");
+    assert!(dead.len() == 1, "expected 1 dead column, got: {dead:?}");
+    assert!(dead[0].name == "raw_value", "expected raw_value to be dead, got: {dead:?}");
 }
 
 #[test]
@@ -78,7 +87,7 @@ fn used_as_lookup_key_or_destination_is_not_dead() {
     let dead = dead_committed_columns(&analyzed);
 
     assert!(
-        dead.is_empty(),
-        "expected no dead columns (all are referenced by a lookup), got: {dead:?}"
+        dead.len() == 0,
+        "expected no dead columns, got: {dead:?}"
     );
 }
