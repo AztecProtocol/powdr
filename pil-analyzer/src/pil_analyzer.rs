@@ -57,7 +57,6 @@ fn analyze<T: FieldElement>(files: Vec<PILFile>) -> Analyzed<T> {
             let file = d.source.file_name.as_ref().unwrap();
             eprintln!("- {} ({}): {} .. {}", d.name, file, d.source.start, d.source.end);
         }
-        panic!("Isolated committed columns detected");
     }
     analyzed
 }

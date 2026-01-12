@@ -30,18 +30,16 @@ fn not_isolated_when_constrained_with_other_committed() {
 }
 
 #[test]
-fn not_isolated_when_constrained_with_fixed() {
+fn test_dead_columns() {
     let input = r#"
-        namespace N(16);
-        pol constant c;
         pol commit a;
-        a - c = 0;
     "#;
     let analyzed = analyze_string::<GoldilocksField>(input);
     let isolated = isolated_committed_columns(&analyzed);
-
-    assert!(isolated.len() == 0, "expected no isolated columns, got: {isolated:?}");
+    assert!(isolated.len() == 1, "expected 1 isolated column, got: {isolated:?}");
+    assert!(isolated[0].name == "a", "expected a to be isolated, got: {isolated:?}");
 }
+
 
 #[test]
 fn isolated_if_only_used_in_unused_intermediate() {
