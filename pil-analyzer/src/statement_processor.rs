@@ -375,8 +375,6 @@ where
             }
         };
 
-        println!("ATTR IN STATEMENT PROCESSOR {attribute:?}");
-
         vec![PILItem::Identity(Identity {
             id: self.counters.dispense_identity_id(),
             attribute,

@@ -5,7 +5,7 @@ use std::iter::once;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use itertools::Itertools;
+
 use powdr_ast::parsed::asm::{
     parse_absolute_path, AbsoluteSymbolPath, SymbolPath,
 };
@@ -23,7 +23,7 @@ use powdr_ast::analyzed::{
 use powdr_parser::{parse_type};
 
 use crate::type_inference::{infer_types, ExpectedType};
-use crate::{side_effect_checker, AnalysisDriver};
+use crate::{AnalysisDriver, check_no_dead_committed_columns, side_effect_checker};
 
 use crate::statement_processor::{Counters, PILItem, StatementProcessor};
 use crate::{condenser, evaluator, expression_processor::ExpressionProcessor};
@@ -51,7 +51,11 @@ fn analyze<T: FieldElement>(files: Vec<PILFile>) -> Analyzed<T> {
     analyzer.process(files);
     analyzer.side_effect_check();
     analyzer.type_check();
-    analyzer.condense()
+    let analyzed = analyzer.condense();
+    if let Err(e) = check_no_dead_committed_columns(&analyzed) {
+        eprintln!("Error checking for dead committed columns: {e}");
+    }
+    analyzed
 }
 
 #[derive(Default)]

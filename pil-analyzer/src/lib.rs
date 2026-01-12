@@ -2,6 +2,7 @@
 
 mod call_graph;
 mod condenser;
+mod dead_column_checker;
 pub mod evaluator;
 pub mod expression_processor;
 mod pil_analyzer;
@@ -24,6 +25,7 @@ use powdr_ast::{
 };
 
 pub use pil_analyzer::{analyze_ast, analyze_file, analyze_string};
+pub use dead_column_checker::{check_no_dead_committed_columns, dead_committed_columns, DeadColumn};
 
 pub trait AnalysisDriver: Clone + Copy {
     /// Turns a declaration into an absolute name.
