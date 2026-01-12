@@ -12,10 +12,6 @@ pub struct DeadColumn {
 
 /// Returns committed/witness columns (including array elements) that are declared but never used
 /// by any identity (constraints/lookups/permutations), nor by public declarations.
-///
-/// Notes:
-/// - Intermediate polynomials are inlined first, so columns used via intermediates are counted as used.
-/// - Unused intermediate polynomials do NOT “rescue” witness columns from being considered dead.
 pub fn dead_committed_columns<T: FieldElement>(analyzed: &Analyzed<T>) -> Vec<DeadColumn> {
     let used_poly_ids = used_poly_ids(analyzed);
 
